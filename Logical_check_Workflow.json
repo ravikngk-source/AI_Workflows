@@ -1,0 +1,217 @@
+{
+  "name": "Logical_check_Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Personal_info",
+        "formDescription": "Few personal information required to check eligibility",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "First Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Last Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Salary",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Mobile No.",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Address"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -592,
+        -16
+      ],
+      "id": "9fbe32fd-ae84-455b-8714-a2fdb41f9dc0",
+      "name": "On form submission",
+      "webhookId": "88c5ee19-f818-4c51-8146-2efe14443d9a"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "69e9e990-96cc-43e5-b081-e38ac8ce7c8e",
+              "name": "Full Name",
+              "value": "={{ $json['First Name'] }} {{ $json['Last Name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "7e493ed3-35be-49b4-b83a-2476a2969538",
+              "name": "Mobile No.",
+              "value": "=+91{{ $json['Mobile No.'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -384,
+        -16
+      ],
+      "id": "2832d035-3558-4dcb-b971-11fc3c400313",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a0a70852-b4e6-4b3c-a154-17bfa320e9a1",
+              "leftValue": "={{ $('On form submission').item.json.Salary }}",
+              "rightValue": 35000,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -176,
+        -16
+      ],
+      "id": "f7a80a28-fe3b-4389-87e0-40dce59afd9d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "=Congradulation {{ $('On form submission').item.json['First Name'] }} You are eligible for load",
+        "emailType": "text",
+        "message": "=Hello {{ $json[\"Full Name\"] }},\n\nCongratulations! Based on your salary of {{ $('On form submission').item.json.Salary }}, you are eligible for a loan.\n\nOur executive will contact you shortly using your provided details:\n\nPhone: {{ $('On form submission').item.json[\"Mobile No.\"] }}\nEmail: {{ $('On form submission').item.json.Email }}\n\nThank you for reaching out to us.\n\nRegards,\nTheITQC Bank Co-operative Ltd.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        -112
+      ],
+      "id": "3e457519-279a-4c82-bee8-01f4a2a3b54d",
+      "name": "Send a message",
+      "webhookId": "0980f7a5-d9e7-41fe-a004-44bfabf7b428",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "FYUj1VZzxVscgZi8",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "=Sorry {{ $('On form submission').item.json['First Name'] }} your loan request rejected ",
+        "emailType": "text",
+        "message": "=Hello {{ $json[\"Full Name\"] }},  \n\nThank you for your interest in our loan services.  \n\nBased on the salary details provided ({{ $('On form submission').item.json.Salary }}), we regret to inform you that you are currently not eligible for a loan.  \n\nHowever, this does not prevent you from applying in the future. You may become eligible as your financial profile improves.  \n\nIf you have any questions or would like guidance on eligibility criteria, feel free to reach out to us.  \n\nPhone: 9987701172\nEmail: ravik.ngk@gmail.com\n\n\nRegards, \nTheITQC Bank Co-operative Ltd.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        80
+      ],
+      "id": "65b21a95-53c8-45c4-a069-001960a035e1",
+      "name": "Send a message1",
+      "webhookId": "a8ed84ae-2e7a-44ac-952d-7fd0544ad7fb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "FYUj1VZzxVscgZi8",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5bc79f60-74fa-4394-8025-be3b64600f08",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a32143cae2fbbb3c0afeb4f659a9eaa219ccab55c2bc05111f2d36ef4d067a9a"
+  },
+  "id": "ILJMmnk2qmQg5PIV",
+  "tags": []
+}

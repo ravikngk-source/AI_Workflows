@@ -1,0 +1,227 @@
+{
+  "name": "Save_data_in_Sheet",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Feedback Form",
+        "formDescription": "Feedback Form",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "email",
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Mobile",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Feedback",
+              "fieldType": "textarea",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -400,
+        -16
+      ],
+      "id": "6b8759d2-a557-4718-b3ae-9859f00391fa",
+      "name": "On form submission",
+      "webhookId": "44dbe6de-b891-4fa1-94f9-d614f7ba96a5"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1eHVacMi9OEgETOW3tFPO1aj0DHA0VtTKHOTZktXuzD8",
+          "mode": "list",
+          "cachedResultName": "Feedback_Sheet_n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eHVacMi9OEgETOW3tFPO1aj0DHA0VtTKHOTZktXuzD8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "AgenticAI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eHVacMi9OEgETOW3tFPO1aj0DHA0VtTKHOTZktXuzD8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "email": "={{ $json.email }}",
+            "Mobile": "={{ $json.Mobile }}",
+            "Feedback": "={{ $json.Feedback }}",
+            "SubmittedAt": "={{ $json.submittedAt }}"
+          },
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mobile",
+              "displayName": "Mobile",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Feedback",
+              "displayName": "Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SubmittedAt",
+              "displayName": "SubmittedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -16,
+        -16
+      ],
+      "id": "b3cdf641-b2e4-4e06-95d0-4caea603d13c",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "iIMHjdQmepXM7agw",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -192,
+        -16
+      ],
+      "id": "e6b6a707-c9c7-42a6-ad9d-ad946ff8d61a",
+      "name": "Wait",
+      "webhookId": "5aeb2b52-d6b1-4930-8bdc-255878ed0beb"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "=Thank {{ $json.Name }} For your feedback  ",
+        "emailType": "text",
+        "message": "=Hello   {{ $json.Name }}\n\nThank You for your feedback, Your feedback is valueble for us.\n\nRegards, \nTheITQC.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        -16
+      ],
+      "id": "3cb2db41-13d7-48a0-adb5-039853f4a794",
+      "name": "Send a message",
+      "webhookId": "0b03945d-201d-4d8c-8dfc-40c0c4c83261",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "FYUj1VZzxVscgZi8",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "53669439-eaa6-4465-891c-d764c16a35c0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a32143cae2fbbb3c0afeb4f659a9eaa219ccab55c2bc05111f2d36ef4d067a9a"
+  },
+  "id": "xALL606oTYLG2ADt",
+  "tags": []
+}

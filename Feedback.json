@@ -1,0 +1,125 @@
+{
+  "name": "Feedback",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Feedback Form",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Message",
+              "fieldType": "textarea",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -464,
+        -32
+      ],
+      "id": "3ee91ecd-6ff7-499e-8937-dd17d87fe564",
+      "name": "My Feedback form",
+      "webhookId": "170b484a-36ad-4b0c-a578-e28db4008d64"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "=Thank You  {{ $json.Name }} for your feedback",
+        "emailType": "text",
+        "message": "=Hi  {{ $json.Name }}, \n\nThank you for your feedback, Your feedback is really help us to improve our services.\n\nThanks \nRaviK\nFrom TheITQC",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        -32
+      ],
+      "id": "8d40807d-0a2c-4dde-8411-0b65c3112400",
+      "name": "Send a message",
+      "webhookId": "dc97ceee-1507-4672-b7e7-29fae98c2175",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "yPkW6QekIxx7pDpw",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "ravik.ngk@gmail.com",
+        "subject": "=Feedback mail from  {{ $('My Feedback form').item.json.Name }}",
+        "emailType": "text",
+        "message": "=Hello Ravi, \n\nThe Student named {{ $('My Feedback form').item.json.Name }} provided feedback\n\n\n{{ $('My Feedback form').item.json.Message }}\n\n\n\nRegards \nAutomation Team. ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -48,
+        -32
+      ],
+      "id": "6bcbf3e7-cfe3-454b-a059-099b4b16a58b",
+      "name": "Send a message1",
+      "webhookId": "88d2ae64-3d7d-4273-9eb6-45a447779359",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "FYUj1VZzxVscgZi8",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "My Feedback form": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3ca60449-3bf7-4e01-97a6-54a2eea9b544",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a32143cae2fbbb3c0afeb4f659a9eaa219ccab55c2bc05111f2d36ef4d067a9a"
+  },
+  "id": "uhCpZ9QCH7g6f1pU",
+  "tags": []
+}
