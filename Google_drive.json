@@ -1,0 +1,242 @@
+{
+  "name": "Google_drive",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Material Request",
+        "formDescription": "Material Request",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Details",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -800,
+        -16
+      ],
+      "id": "738c8e10-d896-4817-9f07-19d4ba8dc980",
+      "name": "On form submission",
+      "webhookId": "6a9f471f-055d-4aa9-9620-6a09a5dcc80e"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "=Hello  {{ $('On form submission').item.json.Name }} download learning material",
+        "emailType": "text",
+        "message": "=Hello  {{ $('On form submission').item.json.Name }}\n\nPlease refer attached learning material for your downloads purpose.\n\nThanks\nRavik\nFrom TheITQC",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        -16
+      ],
+      "id": "6db9cac0-7edc-44fa-a164-da48b8828c1c",
+      "name": "Send a message",
+      "webhookId": "97cded95-5dfd-4f49-9405-95dc0d9a0dcd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "FYUj1VZzxVscgZi8",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1PuqbaYfkM69llajao8amWIFolJn2jB0Qn7h6CV1pJ10",
+          "mode": "list",
+          "cachedResultName": "LearningMaterialRequest",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PuqbaYfkM69llajao8amWIFolJn2jB0Qn7h6CV1pJ10/edit?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -416,
+        -16
+      ],
+      "id": "a3f45dde-7d26-4dfa-9bf0-dbdd913f532e",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "9KQiyyTUfQHFUN0l",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1PuqbaYfkM69llajao8amWIFolJn2jB0Qn7h6CV1pJ10",
+          "mode": "list",
+          "cachedResultName": "LearningMaterialRequest",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PuqbaYfkM69llajao8amWIFolJn2jB0Qn7h6CV1pJ10/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1466511719,
+          "mode": "list",
+          "cachedResultName": "MaterialRequestSheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PuqbaYfkM69llajao8amWIFolJn2jB0Qn7h6CV1pJ10/edit#gid=1466511719"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Email": "={{ $json.Email }}",
+            "Details": "={{ $json.Details }}",
+            "submittedAt": "={{ $json.submittedAt }}",
+            "formMode": "={{ $json.formMode }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Details",
+              "displayName": "Details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "submittedAt",
+              "displayName": "submittedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "formMode",
+              "displayName": "formMode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -576,
+        -16
+      ],
+      "id": "cddaf5b7-ffa4-41c9-9577-ad93c2f6a951",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "iIMHjdQmepXM7agw",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "adf01a7e-e7e9-4eed-b07d-b3292059ee23",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a32143cae2fbbb3c0afeb4f659a9eaa219ccab55c2bc05111f2d36ef4d067a9a"
+  },
+  "id": "5QgpT59amg3yujfF",
+  "tags": []
+}
