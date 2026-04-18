@@ -1,0 +1,165 @@
+{
+  "name": "AI Updates",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1088,
+        -80
+      ],
+      "id": "86b0061c-1adc-44d0-b8b2-232c2c2dd7c3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "query": "Top 5 AI News for the Day",
+        "options": {
+          "include_answer": "advanced"
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavily",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        -80
+      ],
+      "id": "b2cbd2d1-5f30-4584-8da6-b957140d2b85",
+      "name": "Search",
+      "credentials": {
+        "tavilyApi": {
+          "id": "05uGa9VZJarpkV7i",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.results }}",
+        "options": {
+          "systemMessage": "=You are an expert technology news analyst specializing in Artificial Intelligence.\n\nYour task is to analyze multiple search results and generate a clear, concise, and realistic summary of the top AI-related news.\n\nInstructions:\n- Read all inputs carefully and identify the most important and recent AI news\n- Select the top 5 unique and relevant topics\n- Avoid duplicate or low-value news\n- Focus on real-world impact, trends, and major updates (not minor details)\n- Keep language simple and easy to understand (non-technical audience)\n\nOutput Format (STRICT):\n\nTitle: Top 5 AI News Updates\n\n1. <News Topic Title>\n<Short summary in 2-3 lines explaining what happened and why it matters>\n\n2. <News Topic Title>\n<Short summary in 2-3 lines>\n\n3. <News Topic Title>\n<Short summary in 2-3 lines>\n\n4. <News Topic Title>\n<Short summary in 2-3 lines>\n\n5. <News Topic Title>\n<Short summary in 2-3 lines>\n\nRules:\n- Each summary must be crisp, realistic, and to the point\n- Avoid technical jargon or complex explanations\n- Do not include links, sources, or raw data\n- Do not exaggerate or add assumptions\n- Ensure all 5 topics are different and meaningful\n- Keep tone professional and informative "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -640,
+        -112
+      ],
+      "id": "186e716d-9d5a-491e-93ed-d0633a9ba745",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sendTo": "ravik.ngk@gmail.com",
+        "subject": "=Top 5 AI New Updates",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        -112
+      ],
+      "id": "f20165ea-730d-434b-a42d-b805936e2a29",
+      "name": "Send a message",
+      "webhookId": "17fdf008-d1a3-4a6d-845e-bb76e6854537",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "yPkW6QekIxx7pDpw",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "google/gemma-3-12b-it:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        96
+      ],
+      "id": "bb792095-91dd-49b2-8aca-bf8fd834f9bf",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "GhDAORicB47tfp4e",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1ca83059-9295-430c-85a8-4a89b1c7996e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a32143cae2fbbb3c0afeb4f659a9eaa219ccab55c2bc05111f2d36ef4d067a9a"
+  },
+  "id": "2emwO1qE90zuVgIB",
+  "tags": []
+}

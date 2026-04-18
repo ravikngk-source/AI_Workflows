@@ -1,0 +1,167 @@
+{
+  "name": "LiveCrick_update",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        -32
+      ],
+      "id": "a0b0561b-510c-4c2e-a62b-129956af39aa",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "query": "What is the Today's IPL Match information ?",
+        "options": {
+          "include_answer": "advanced"
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavily",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -32
+      ],
+      "id": "86cf356d-f581-405a-9835-e33407e41d40",
+      "name": "Search",
+      "credentials": {
+        "tavilyApi": {
+          "id": "05uGa9VZJarpkV7i",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.results }}",
+        "options": {
+          "systemMessage": "You are a real-time sports data analyst specializing in cricket match insights.\n\nYour task is to analyze multiple search results and generate a structured, accurate, and meaningful live match summary.\n\nInstructions:\n- Read all inputs carefully and extract the most recent match information\n- Identify all ongoing matches with team names\n- Extract current score (runs/wickets) and overs\n- Identify batting and bowling teams\n- Extract top 2 current batsmen with their runs (if available)\n- Extract current bowler with overs and wickets (if available)\n- Remove duplicate, outdated, or conflicting data\n- If multiple updates exist, prioritize the latest and most consistent information\n\nOutput Format (STRICT):\n\nMatch Summary:\n\nFor each match, use the format below:\n\n<TEAM 1> VS <TEAM 2>  \nScore: <Runs/Wickets - Overs>  \nBatting: <Team Name>  \nBowling: <Team Name>  \n\nTop Batsmen:  \n- <Batsman 1 Name> - <Runs>(<Balls if available>)  \n- <Batsman 2 Name> - <Runs>(<Balls if available>)  \n\nCurrent Bowler:  \n- <Bowler Name> - <Overs> (<Wickets>/<Runs Conceded>)  \n\n(Repeat for each match, separated by a blank line)\n\nExample:\n\nRCB VS MI  \nScore: 59/6 - 12 Over  \nBatting: RCB  \nBowling: MI  \n\nTop Batsmen:  \n- Kohli - 32(25)  \n- Maxwell - 15(10)  \n\nCurrent Bowler:  \n- Bumrah - 2.2 (2/10)  \n\nSummary Insights:\n- Provide exactly 5 bullet points\n- Each bullet should be 1–2 lines only\n- Focus on match momentum, pressure situations, and key performances\n- Highlight wickets, partnerships, or dominance shifts\n- Use natural, commentary-style language\n\nRules:\n- Do not merge multiple matches into one line\n- If any data is missing, write \"Data not available\"\n- Do not include links, raw data, or source references\n- Keep output clean, structured, and consistent"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -48,
+        -32
+      ],
+      "id": "1d61947f-7b3d-4aca-813c-e23b2e66b80a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openrouter/free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        176
+      ],
+      "id": "aad4c7cb-ea98-4828-b091-b63fe1659ccf",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "GhDAORicB47tfp4e",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "ravik.ngk@gmail.com",
+        "subject": "Today's IPL Match Live Update ",
+        "emailType": "text",
+        "message": "=Hey Find  Match updates as below :- \n\n{{ $json.output }}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        -32
+      ],
+      "id": "7eb79eb0-5e7c-4cbb-b8a1-80fe02f626e7",
+      "name": "Send a message",
+      "webhookId": "bc1812ff-e0d0-43d9-bde2-5bf6af5287d3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "FYUj1VZzxVscgZi8",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "88477507-5894-4c35-90e9-0964ce925423",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a32143cae2fbbb3c0afeb4f659a9eaa219ccab55c2bc05111f2d36ef4d067a9a"
+  },
+  "id": "Cu2aykO5ohA3jThi",
+  "tags": []
+}
