@@ -84,7 +84,7 @@
     },
     {
       "parameters": {
-        "model": "google/gemma-3-12b-it:free",
+        "model": "openrouter/free",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
@@ -155,7 +155,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "1ca83059-9295-430c-85a8-4a89b1c7996e",
+  "versionId": "ce771189-cb51-4a0f-9ef4-02672ae81837",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "a32143cae2fbbb3c0afeb4f659a9eaa219ccab55c2bc05111f2d36ef4d067a9a"
