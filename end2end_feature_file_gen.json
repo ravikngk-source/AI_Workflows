@@ -1,0 +1,478 @@
+{
+  "name": "end2end_feature_file_gen",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "JIRA Info",
+        "formDescription": "JIRA Info",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "JIRA ID",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -288,
+        -16
+      ],
+      "id": "18e58200-be3d-42e3-a0d3-b5510cbafedf",
+      "name": "On form submission",
+      "webhookId": "d05a7e91-8ccd-45a5-ac74-46028fad511c"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "issueKey": "=SCRUM-1",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -16
+      ],
+      "id": "e966d23b-4a67-4698-8473-4c8c9f9bcc34",
+      "name": "Get an issue",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "f1FtuQaMqrUQRWtj",
+          "name": "Jira SW Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following JIRA description and generate test scenarios.\n\nJIRA Description:\n{{ $json.fields.description }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a Senior QA Test Architect with 15+ years of experience in functional, edge case, and risk-based testing.\n\nYour task is to analyze a JIRA ticket description and generate high-quality, structured test scenarios.\n\nInstructions:\n1. Carefully analyze the JIRA description.\n2. Identify:\n   - Functional requirements\n   - Implicit behaviors\n   - Possible failure points\n3. Generate test scenarios covering:\n   - Positive cases (valid expected behavior)\n   - Negative cases (invalid inputs, error handling, failures)\n   - Edge cases (boundary conditions, unusual situations)\n\nOutput Format (STRICT – DO NOT CHANGE):\n\nPositive Cases:\n1. \n2. \n3. \n\nNegative Cases:\n1. \n2. \n3. \n\nEdge Cases:\n1. \n2. \n3. \n\nRules:\n- Each test scenario must be clear, concise, and testable\n- Do NOT write test cases (steps), only scenarios\n- Avoid generic statements like \"verify functionality works\"\n- Include realistic and practical scenarios\n- Cover boundary values, nulls, empty inputs, and unexpected behavior\n- Ensure no duplication across categories\n- Minimum 5 scenarios per category (add more if needed)\n\nIf requirement unclear, Do not make any assumptions and create scenarios.\n\nJust say sorry, I can not generate scenario for this use case better if you could update the descriptions in more details\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        128,
+        -16
+      ],
+      "id": "ce56f67a-e569-4339-9fff-1cf77cde5de2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -48,
+        224
+      ],
+      "id": "72659a14-59e9-41bf-a7e6-22ae936bcb3c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bcOHo7WbOGu58kw5",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1F1dZBE1fUUP1w_AewhF4yiGJMN4RY75WLpQfbO4bMsI",
+          "mode": "list",
+          "cachedResultName": "Testing_Usecase",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1F1dZBE1fUUP1w_AewhF4yiGJMN4RY75WLpQfbO4bMsI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "TestScenario",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1F1dZBE1fUUP1w_AewhF4yiGJMN4RY75WLpQfbO4bMsI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "output"
+          ],
+          "schema": [
+            {
+              "id": "output",
+              "displayName": "output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        -16
+      ],
+      "id": "f1a62cb4-97c3-4acf-9894-85b254a0618a",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "iIMHjdQmepXM7agw",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following Scenarios and generate test cases for each scenario.\n\nScenario Description:\n\n{{ $('AI Agent').item.json.output }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a Senior QA Test Engineer responsible for generating structured test cases.\n\nYour task is to convert given test scenarios into tabular test cases.\n\nOutput Format (STRICT – MUST FOLLOW EXACTLY):\n\nSR | Test Case Name | Step | Input | Expected\n\nCRITICAL FORMATTING RULES:\n1. Each step MUST be on a NEW LINE (new row)\n2. DO NOT combine multiple steps in a single row\n3. DO NOT use inline numbering like \"1 | 2 | 3\"\n4. Each row should represent ONLY ONE step\n5. First row of each test case:\n   - Include SR (TC01, TC02…)\n   - Include Test Case Name\n6. Remaining rows of same test case:\n   - Keep SR EMPTY\n   - Keep Test Case Name EMPTY\n7. Use proper line breaks between rows (like Excel rows)\n8. Do NOT wrap entire output in quotes\n9. Do NOT return as paragraph or JSON\n10. Output must look like a clean table when copied\n\nSTRUCTURE EXAMPLE (FOLLOW EXACTLY):\n\nTC01 | Valid Login | Launch browser | Chrome | Browser should launch\n     |             | Navigate to URL | example.com | Login page should open\n     |             | Enter username | user1 | Username accepted\n     |             | Enter password | pass123 | Password accepted\n     |             | Click login | NA | User logged in\n\nIMPORTANT:\n- One scenario = one test case\n- Minimum 4–6 steps per test case\n- Use realistic inputs\n- Keep each step short and atomic\n- Expected result should validate that step only\n\nDO NOT:\n- Combine steps\n- Add extra explanations\n- Change format"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        160,
+        240
+      ],
+      "id": "10d8124d-cce0-4321-84a8-da4ba9a57775",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        112,
+        480
+      ],
+      "id": "8fd856c9-be15-4ed0-9ccf-ed120c4720ab",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "bcOHo7WbOGu58kw5",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1F1dZBE1fUUP1w_AewhF4yiGJMN4RY75WLpQfbO4bMsI",
+          "mode": "list",
+          "cachedResultName": "Testing_Usecase",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1F1dZBE1fUUP1w_AewhF4yiGJMN4RY75WLpQfbO4bMsI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1642169213,
+          "mode": "list",
+          "cachedResultName": "TestCases",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1F1dZBE1fUUP1w_AewhF4yiGJMN4RY75WLpQfbO4bMsI/edit#gid=1642169213"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "SR",
+              "displayName": "SR",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Test Case Name",
+              "displayName": "Test Case Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Input",
+              "displayName": "Input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Expected",
+              "displayName": "Expected",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        240
+      ],
+      "id": "2090d7e1-d86b-4338-8b78-058cc518ddc4",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "iIMHjdQmepXM7agw",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Convert the following test cases into Gherkin (.feature) format.\n\nRules:\n- Use Feature, Scenario\n- Use Given, When, Then\n- Maintain logical flow\n- Each step on new line\n- Clean readable format\n\nTest Cases:\n{{ $('AI Agent2').item.json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        672,
+        240
+      ],
+      "id": "24f7a4ee-8aaa-4d26-b4dd-0c1d0853aaff",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "openrouter/free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        544,
+        448
+      ],
+      "id": "f052d5ba-e4ee-4bea-8950-acd6825beb81",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "GhDAORicB47tfp4e",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "https://github.com/ravikngk-source",
+          "mode": "url"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "AI_TEST_GEN",
+          "mode": "list",
+          "cachedResultName": "AI_TEST_GEN",
+          "cachedResultUrl": "https://github.com/ravikngk-source/AI_TEST_GEN"
+        },
+        "filePath": "={{ $('On form submission').item.json['JIRA ID'] }}.feature",
+        "fileContent": "={{ $json.output }}",
+        "commitMessage": "AI generated feature file"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        1024,
+        240
+      ],
+      "id": "afd95440-5845-4fc3-92a2-4fe153e2ada4",
+      "name": "Create a file",
+      "webhookId": "bd46b4d3-f2ca-4042-97f9-facef6df7b19",
+      "credentials": {
+        "githubOAuth2Api": {
+          "id": "99W0FDGWRHygSuMx",
+          "name": "GitHub OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Get an issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get an issue": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Create a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ead42f16-9168-4320-8bf8-66e0a8f98d64",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a32143cae2fbbb3c0afeb4f659a9eaa219ccab55c2bc05111f2d36ef4d067a9a"
+  },
+  "id": "sQ38mzqmFwlcxM5r",
+  "tags": []
+}
