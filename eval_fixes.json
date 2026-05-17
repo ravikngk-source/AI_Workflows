@@ -1,0 +1,465 @@
+{
+  "name": "eval_optimize_flow2_fix",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "=Student Request Form",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Question",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -1728,
+        384
+      ],
+      "id": "607c6b08-1e06-40af-b992-c8bdb57f5b73",
+      "name": "Student Request Form",
+      "webhookId": "5ccb7bee-8131-4573-8402-d00256422539"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3d0320fd-55ab-429c-98d8-4084e45cf129",
+              "name": "retry_count",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "1db60423-1680-41c0-9230-57b373f4286a",
+              "name": "current_answer",
+              "value": "\"\"",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1552,
+        384
+      ],
+      "id": "e129f359-36d2-4595-b717-10e534967eaa",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Student Request Form').item.json.Question }}",
+        "options": {
+          "systemMessage": "You are a DURGASOFT faculty assistant.\n\nAnswer the student question in simple Indian English.\n\nRules:\n1. Explain like a classroom trainer.\n2. Use beginner-friendly language.\n3. Give one real-time example.\n4. If it is technical, give simple code.\n5. Avoid complex words.\n6. Make answer useful for students and job seekers.\n\nOutput format:\n\nTitle:\nSimple Explanation:\nReal-Time Example:\nCode Example:\nFinal Summary:"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1360,
+        384
+      ],
+      "id": "7b4522f3-7270-4ada-839b-737a3afe5a64",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -1456,
+        592
+      ],
+      "id": "382002aa-1b6e-41b5-ad14-14d8d6bb4fc5",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "WTqSV1UcxGu65kID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "70b30fe6-bf2e-4299-b963-bb5a4803a7a1",
+              "name": "retry_count",
+              "value": "={{ $('Edit Fields2').isExecuted ? $('Edit Fields2').item.json.retry_count : $('Edit Fields').item.json.retry_count }}",
+              "type": "number"
+            },
+            {
+              "id": "8b36db5b-8a35-4cd3-9e30-32e3e228cb96",
+              "name": "current_answer",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1056,
+        384
+      ],
+      "id": "af537c3f-6ab0-4c7f-9cae-ac6a0c5b71ce",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Question: {{ $('Student Request Form').item.json.Question }}\n\nCurrent Answer: {{ $json.current_answer }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a strict DURGASOFT answer evaluator.\n\nCheck the given answer based on:\n\n1. Simple Indian English\n2. Correct explanation\n3. Beginner-friendly clarity\n4. Real-time example\n5. Code example if required\n6. Proper structure\n7. Useful for students and job seekers\n\nGive score out of 100.\n\nReturn only valid JSON.\n\nFormat:\n{\n \"score\": 85,\n \"status\": \"approved\",\n \"feedback\": \"Answer is clear and useful.\"\n}\n\nRules:\nIf score is 90 or above, status should be \"approved\".\nIf score is below 90, status should be \"needs_improvement\".\nDo not add extra text outside JSON."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -848,
+        384
+      ],
+      "id": "c14a284f-4f3a-4d9c-95c1-78c8ccd6cc0c",
+      "name": "Eval Agent"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n \"score\": 85,\n \"status\": \"approved\",\n \"feedback\": \"Answer is clear and useful.\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -672,
+        592
+      ],
+      "id": "480610b8-13f1-4e22-a782-f5348a761846",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "score-approved-condition",
+              "leftValue": "={{ $json.output.score }}",
+              "rightValue": 97,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "a80cbc36-7a95-4dc7-80df-359616778768",
+              "leftValue": "={{ $('Edit Fields1').item.json.retry_count }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -496,
+        384
+      ],
+      "id": "78198614-b1e7-40d9-8b63-646c71e377ae",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Student Request Form').item.json.Email }}",
+        "subject": "Answwer for your Query",
+        "emailType": "text",
+        "message": "=score: {{ $('Eval Agent').item.json.output.score }}\n\nretry_count: {{ $json.retry_count || $('Edit Fields1').item.json.retry_count }}\n\n{{ $json.current_answer || $('Edit Fields1').item.json.current_answer }}\n\nRegards\nDURGASOFT",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "36e8c022-2dad-4505-8843-61e8e217be72",
+      "name": "Send a message",
+      "webhookId": "bad0289d-2ec1-483f-9c49-6f00e12ad7fa",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "NLdLA73IwrBKOz7P",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "retry-count-increment",
+              "name": "retry_count",
+              "value": "={{ $('Edit Fields1').item.json.retry_count + 1 }}",
+              "type": "number"
+            },
+            {
+              "id": "carry-current-answer",
+              "name": "current_answer",
+              "value": "={{ $('Edit Fields1').item.json.current_answer }}",
+              "type": "string"
+            },
+            {
+              "id": "carry-last-score",
+              "name": "last_score",
+              "value": "={{ $('Eval Agent').item.json.output.score }}",
+              "type": "number"
+            },
+            {
+              "id": "carry-last-feedback",
+              "name": "last_feedback",
+              "value": "={{ $('Eval Agent').item.json.output.feedback }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -112,
+        432
+      ],
+      "id": "acbe7994-24e9-407e-8b86-13931a78cfea",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        288,
+        656
+      ],
+      "id": "f5adcfb7-0fc5-4c79-ba75-1728ba7b9252",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "WTqSV1UcxGu65kID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Question: {{ $('Student Request Form').item.json.Question }}\n\nCurrent Answer: {{ $json.current_answer }}\n\nScore: {{ $json.last_score }}\n\nFeedback: {{ $json.last_feedback }}",
+        "options": {
+          "systemMessage": "You are a senior DURGASOFT faculty optimizer.\n\nImprove the previous answer based on evaluator feedback.\n\nRules:\n1. Make explanation simpler.\n2. Add missing points.\n3. Add real-time DURGASOFT style example.\n4. Add simple code if required.\n5. Improve structure.\n6. Make it suitable for beginners.\n7. Do not make it too long unnecessarily.\n\nOutput format:\n\nTitle:\nImproved Explanation:\nReal-Time Example:\nCode Example:\nStudent Takeaway:\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        400,
+        448
+      ],
+      "id": "e0796185-4082-4b04-9190-6780028ba3ec",
+      "name": "Optimizer Agent"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Student Request Form": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Eval Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Eval Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Eval Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eval Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Optimizer Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Optimizer Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Optimizer Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5d639a4e-5122-4ef8-a11b-7b1acf232d31",
+  "meta": {
+    "instanceId": "114816880cc1ea6dc9d7768443ed6b12876388edfc6627c0deeebb832cb1a175"
+  },
+  "id": "i8eFLPxAMqmOcEtu",
+  "tags": []
+}
